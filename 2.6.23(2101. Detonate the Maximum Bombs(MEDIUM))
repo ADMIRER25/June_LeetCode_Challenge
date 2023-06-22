@@ -1,0 +1,61 @@
+TC : O(N^3)
+SC : O(N^2)
+-------------------------------------------------------------------------------------------
+class Solution {
+    void dfs(vector<int>adj[],vector<int>&vis,int node,int& cnt)
+    {
+        vis[node] = 1;
+        cnt++;
+
+        for(auto nd : adj[node])
+        {
+            if(!vis[nd])
+            {
+                dfs(adj,vis,nd,cnt);
+            }
+        }
+    }
+public:
+    int maximumDetonation(vector<vector<int>>& bombs) 
+    {
+        int n = bombs.size();
+        vector<int>adj[n];
+
+        //make the adjacency list where each node keeps track of the node which it can detonate
+       for(int i = 0; i < n; i++)
+       {
+           int x1 = bombs[i][0];
+           int y1 = bombs[i][1];
+           int r1 = bombs[i][2];
+
+           for(int j = 0; j < n; j++)
+           {
+               if(i != j)
+               {
+                 int x2 = bombs[j][0];
+                 int y2 = bombs[j][1];
+
+                //it is the dstance between two nodes
+                 double dist =  sqrt(1ll*(x2-x1)*(x2-x1) + 1ll*(y2-y1)*(y2-y1));
+
+                 if(r1 >= dist)
+                 {
+                     adj[i].push_back(j);
+                 }
+               }
+           }
+       }
+
+       //go for a dfs call 
+       int ans = 0;
+
+       for(int i = 0; i < n; i++)
+       {
+           vector<int>vis(n,0);
+           int cnt = 0;
+           dfs(adj,vis,i,cnt);
+           ans = max(ans,cnt);
+       }
+       return ans;
+    }
+};
