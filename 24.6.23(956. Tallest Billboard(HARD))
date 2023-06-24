@@ -1,0 +1,27 @@
+class Solution {
+    int dp[21][10003];
+    int solve(vector<int>& rods,int idx,int diff)
+    {
+        if(idx >= rods.size())
+        {
+            if(diff == 0) return 0;
+            return INT_MIN;
+        }
+        if(dp[idx][diff+5000] != -1) return dp[idx][diff+5000];
+
+        int not_take = solve(rods,idx+1,diff);
+        int take_left = rods[idx]+solve(rods,idx+1,diff+rods[idx]);
+        int take_right = rods[idx]+solve(rods,idx+1,diff-rods[idx]);
+
+        return dp[idx][diff+5000] = max({not_take,take_left,take_right});
+    }
+public:
+    int tallestBillboard(vector<int>& rods) 
+    {
+        memset(dp,-1,sizeof(dp));
+
+        int ans = solve(rods,0,0);
+
+        return (ans != INT_MIN)? (ans/2) : 0;
+    }
+};
