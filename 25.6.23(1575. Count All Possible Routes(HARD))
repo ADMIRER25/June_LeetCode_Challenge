@@ -1,0 +1,33 @@
+class Solution {
+    long long mod = 1e9+7;
+public:
+    int dp[101][202];
+    int helper(vector<int>& loc, int s, int f, int fuel)
+    {
+            long long ans = 0;
+            if(fuel < 0) return 0;
+
+            if(s == f)
+            {
+                ans += 1; 
+            }
+            if(fuel == 0) return ans;
+
+            if(dp[s][fuel] != -1) return dp[s][fuel];
+
+            int n = loc.size();
+
+            for(int i = 0; i < n; i++)
+            {
+                if(i == s) continue;
+
+                ans += helper(loc,i,f,fuel-abs(loc[i]-loc[s]))%mod;
+            }
+            return dp[s][fuel] = ans%mod; 
+    }
+    int countRoutes(vector<int>& loc, int s, int f, int fuel)
+    {
+        memset(dp,-1,sizeof(dp));
+        return helper(loc,s,f,fuel);
+    }
+};
