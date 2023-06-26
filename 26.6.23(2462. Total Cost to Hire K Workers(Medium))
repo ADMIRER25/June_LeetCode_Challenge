@@ -1,0 +1,65 @@
+class Solution {
+public:
+    long long totalCost(vector<int>& cost, int k, int take) 
+    {
+        typedef pair<int,int>p;
+
+        int n = cost.size();
+        //if 2*take >= n then we will simply push everything into a pq then run it for k times
+        long long ans = 0;
+        priority_queue<p,vector<p>,greater<p>>pq;
+
+        if(2*take >= n)
+        {
+           for(auto i : cost) 
+           {
+               pq.push({i,0});
+           }
+           while(k--)
+           {
+               auto it = pq.top();
+               ans += it.first;
+               pq.pop();
+           }
+           return ans;
+        }
+        else
+        {
+            int i,j;
+            //from front 
+            int temp = take;
+            for(i = 0; temp--;i++)
+            {
+                pq.push({cost[i],0}); // from front as indicator push 0;
+            }
+            i--;
+            //from back
+            temp = take;
+            for(j = n-1;temp--;j--)
+            {
+                pq.push({cost[j],1}); // from back as indicator push 1;
+            }
+            j++;
+
+            bool flag = false ;
+            while(pq.size() && k--)
+            {
+               auto it = pq.top();
+               pq.pop();
+
+               int c = it.first; // c --> cost[i] 
+               int ind = it.second; // ind --> indicator that it from first or last
+
+               ans += c;
+
+               (!flag && ind == 0)? i++ : j--;
+
+               if(i >= j)
+                flag = true;
+               else
+                (ind == 0)? pq.push({cost[i],0}) : pq.push({cost[j],1});
+            }
+            return ans;
+        }
+    }
+};
