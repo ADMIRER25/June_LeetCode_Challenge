@@ -1,0 +1,41 @@
+class Solution {
+    void dfs(vector<int>adj[],vector<int>&vis,int node)
+    {
+        vis[node] = 1;
+
+        for(int idx : adj[node])
+        {
+            if(!vis[idx]) dfs(adj,vis,idx);
+        }
+    }
+public:
+    int findCircleNum(vector<vector<int>>&v) 
+    {
+        int n = v.size();
+
+        //make adjacency list which is biderectional
+        vector<int>adj[n];
+        for(int i = 0; i < n; i++)
+        {
+            for(int j = 0; j < n;j++)
+            {
+                if(i == j) continue;
+
+                if(v[i][j] == 1) adj[i].push_back(j);
+            }
+        }
+
+        int ans = 0;
+        vector<int>vis(n,0);
+
+        for(int i = 0; i < n; i++)
+        {
+            if(!vis[i]) // not visited
+            {
+                ans++;
+                dfs(adj,vis,i);
+            }
+        }
+        return ans;
+    }
+};
