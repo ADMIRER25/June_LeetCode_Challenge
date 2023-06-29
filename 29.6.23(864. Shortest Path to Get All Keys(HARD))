@@ -1,0 +1,99 @@
+class Solution {
+public:
+    int shortestPathAllKeys(vector<string>& grid)
+    {
+       int m = grid.size();
+       int n = grid[0].size();
+       vector<vector<int>>directions = {{-1,0},{0,-1},{1,0},{0,1}};
+       queue<vector<int>>q; // <x,y,steps,current_key_status>
+
+       //find total number of keys
+       int count = 0;
+       int x,y;
+       for(int i = 0; i < m; i++)
+       {
+           for(int j = 0; j < n; j++)
+           {
+               char ch = grid[i][j];
+               if(ch >= 'a' && ch <= 'f') count++; // key number max 6
+               else if(ch == '@') 
+               {
+                   x = i,y = j;
+               }
+           }
+       }
+
+       int final_key_status_decimal = pow(2,count) - 1; // 1 1 1 --> 7 if there are 3 keys a b and c
+
+       int vis[m][n][final_key_status_decimal+1]; // +1 becase 0 based indexing for 7 it is 0 - 6 if +1 is not added but now it is 0 - 7
+
+       memset(vis,0,sizeof(vis));
+
+       q.push({x,y,0,0});
+       vis[x][y][0] = 1;
+
+       while(q.size())
+       {
+           auto temp = q.front();
+           q.pop();
+
+           int i = temp[0];
+           int j = temp[1];
+           int steps = temp[2];
+           int current_key_status_decimal = temp[3];
+
+
+            //if all the keys are accquired
+           if(current_key_status_decimal == final_key_status_decimal) return steps;
+
+            //if not then go into all possible 4 direction 
+           for(auto &dir : directions)
+           {
+               int i_ = i + dir[0];
+               int j_ = j + dir[1];
+
+               if(i_ >= 0 && i_ < m && j_ >= 0 && j_ < n && grid[i_][j_] != '#')
+               {
+                   char ch = grid[i_][j_];
+
+                   //we can found keys
+                   if(ch >= 'a' && ch <= 'f')
+                   {
+                        // for finding b key suppose we have a key already
+                       // 1 << (b-a) = 0 1 0 | 0 0 1 = 0 1 1 (then we have a an b key )
+                       int new_key_status_decimal = current_key_status_decimal | (1 << (ch - 'a'));
+
+                       if(vis[i_][j_][new_key_status_decimal] == 0)
+                       {
+                          vis[i_][j_][new_key_status_decimal] = 1;
+                          q.push({i_,j_,steps+1,new_key_status_decimal});
+                       }
+                   }
+                   //we can found locks
+                   else if(ch >= 'A' && ch <= 'F')
+                   {
+                         //if we have the corresponding key 
+                        //for b key B lock  
+                       // 0 1 1 >> (B-A) = 0 0 1 & 0 0 1 = 1
+                       if(vis[i_][j_][current_key_status_decimal] == 0 && (current_key_status_decimal >> (ch - 'A') & 1) == 1)
+                       {
+                          vis[i_][j_][current_key_status_decimal] = 1;
+                          q.push({i_,j_,steps+1,current_key_status_decimal});
+                       }
+                   }
+                   //we can found empty cells
+                   else 
+                   {
+                       if(vis[i_][j_][current_key_status_decimal] == 0)
+                       {
+                           vis[i_][j_][current_key_status_decimal] = 1;
+                           q.push({i_,j_,steps+1,current_key_status_decimal});
+                       }
+                   }
+               }
+           }
+
+       }
+        return -1;
+    }
+};
