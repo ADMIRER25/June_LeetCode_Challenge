@@ -1,0 +1,45 @@
+class Solution {
+
+    
+public:
+    double maxProbability(int n, vector<vector<int>>& edges, vector<double>& succProb, int start, int end) 
+    {
+        typedef pair<double,int>p; //prob node
+        vector<pair<int,double>>adj[n]; // node1 --> {node2,prob},{node3,prob}
+        vector<double>result(n,0);
+
+        for(int i = 0; i < edges.size(); i++)
+        {
+            int node1 = edges[i][0],node2 = edges[i][1];
+            double prob = succProb[i];
+
+            adj[node1].push_back({node2,prob});
+            adj[node2].push_back({node1,prob});
+        }
+        priority_queue<p>pq; // max heap
+
+        result[start] = 1;
+        pq.push({1.0,start});
+
+        while(pq.size())
+        {
+          double prob = pq.top().first;
+          int node = pq.top().second;
+          pq.pop();
+
+          for(auto it : adj[node])
+          {
+             int node1 = it.first;
+             double prob1 = it.second;
+
+             //relaxation
+             if(prob * prob1 > result[node1]) 
+             {
+                 result[node1] = prob * prob1;
+                 pq.push({prob*prob1,node1});
+             }
+          }
+        }
+        return result[end];
+    }
+};
